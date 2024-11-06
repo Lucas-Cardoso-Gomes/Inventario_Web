@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventário - Web</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        table {
+            margin-top: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>Lista de Computadores</h1>
+        <table id="computadoresTable" class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th data-column="IP">IP</th>
+                    <th data-column="MAC">MAC</th>
+                    <th data-column="Usuario">Usuário</th>
+                    <th data-column="Hostname">Hostname</th>
+                    <th data-column="Fabricante">Fabricante</th>
+                    <th data-column="Processador">Processador</th>
+                    <th data-column="ProcessadorFabricante">Fabricante do Processador</th>
+                    <th data-column="ProcessadorCore">Núcleos do Processador</th>
+                    <th data-column="ProcessadorThread">Threads do Processador</th>
+                    <th data-column="ProcessadorClock">Clock do Processador</th>
+                    <th data-column="Ram">RAM</th>
+                    <th data-column="RamTipo">Tipo de RAM</th>
+                    <th data-column="RamVelocidade">Velocidade da RAM</th>
+                    <th data-column="RamVoltagem">Voltagem da RAM</th>
+                    <th data-column="ArmazenamentoC">Armazenamento C</th>
+                    <th data-column="ArmazenamentoCTotal">Total Armazenamento C</th>
+                    <th data-column="ArmazenamentoCLivre">Livre Armazenamento C</th>
+                    <th data-column="ArmazenamentoD">Armazenamento D</th>
+                    <th data-column="ArmazenamentoDTotal">Total Armazenamento D</th>
+                    <th data-column="ArmazenamentoDLivre">Livre Armazenamento D</th>
+                    <th data-column="SO">Sistema Operacional</th>
+                    <th data-column="ConsumoCPU">ConsumoCPU</th>
+                    <th data-column="DataColeta">Data da Coleta</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var computador in Model)
+                {
+                    <tr>
+                        <td>@computador.IP</td>
+                        <td>@computador.MAC</td>
+                        <td>@computador.Usuario</td>
+                        <td>@computador.Hostname</td>
+                        <td>@computador.Fabricante</td>
+                        <td>@computador.Processador</td>
+                        <td>@computador.ProcessadorFabricante</td>
+                        <td>@computador.ProcessadorCore</td>
+                        <td>@computador.ProcessadorThread</td>
+                        <td>@computador.ProcessadorClock</td>
+                        <td>@computador.Ram</td>
+                        <td>@computador.RamTipo</td>
+                        <td>@computador.RamVelocidade</td>
+                        <td>@(Convert.ToDouble(computador.RamVoltagem.Replace(" Volts", "")) / 1000.0) V</td>
+                        <td>@computador.ArmazenamentoC</td>
+                        <td>@computador.ArmazenamentoCTotal</td>
+                        <td>@computador.ArmazenamentoCLivre</td>
+                        <td>@computador.ArmazenamentoD</td>
+                        <td>@computador.ArmazenamentoDTotal</td>
+                        <td>@computador.ArmazenamentoDLivre</td>
+                        <td>@computador.SO</td>
+                        <td>@computador.ConsumoCPU</td>
+                        <td>@computador.DataColeta</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <script>
+            $(document).ready(function () {
+                $('#computadoresTable').DataTable({
+                    "paging": true,
+                    "ordering": true,
+                    "searching": true,
+                    "order": [[0, "asc"]],
+                    "columnDefs": [
+                        { "type": "numeric-comma", targets: [8, 10] }
+                    ]
+                });
+            });
+        </script>
+    </main>
+    <footer style="text-align: center;">
+        <a>Produzido por Lucas Cardoso / TIC - PM Logística</a>
+    </footer>
+</body>
+</html>
