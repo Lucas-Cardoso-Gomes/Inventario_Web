@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Net.NetworkInformation;
 
 namespace coleta
@@ -9,12 +11,18 @@ namespace coleta
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
             foreach (NetworkInterface networkInterface in networkInterfaces)
             {
-                if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Ethernet)
-                    continue;
-
-                PhysicalAddress macAddress = networkInterface.GetPhysicalAddress();
-                if (macAddress != null && macAddress.ToString() != "")
-                    return FormatMacAddress(macAddress.GetAddressBytes());
+                if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                    networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                {
+                    if (networkInterface.OperationalStatus == OperationalStatus.Up)
+                    {
+                        PhysicalAddress macAddress = networkInterface.GetPhysicalAddress();
+                        if (macAddress != null && macAddress.GetAddressBytes().Length == 6)
+                        {
+                            return FormatMacAddress(macAddress.GetAddressBytes());
+                        }
+                    }
+                }
             }
             return "Endereço MAC não encontrado";
         }

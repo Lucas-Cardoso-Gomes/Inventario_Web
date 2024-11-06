@@ -15,7 +15,9 @@ namespace coleta
                 {
                     string domain = userName.Substring(0, index);
                     string user = userName.Substring(index + 1);
-                    return $"{domain}\\{user}";
+                    string computerName = ComputerInfo.GetComputerName();
+                    
+                    return $"{domain}\\{user}\n{computerName}";
                 }
             }
             return ("Domínio ou usuariop não Identificado");

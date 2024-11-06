@@ -9,30 +9,43 @@ namespace coleta
         {
             var ArmazenamentoBuilder = new StringBuilder();
             bool unidadeDEncontrada = false;
+            bool unidadeCEncontrada = false;
 
             using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_LogicalDisk WHERE DriveType=3"))
             {
                 foreach (var result in searcher.Get())
                 {
-                    ulong total = Convert.ToUInt64(result["Size"]);
-                    ulong livre = Convert.ToUInt64(result["FreeSpace"]);
                     string letra = result["Name"].ToString();
 
-                    if (letra.Equals("D:"))
+                    if (letra.Equals("C:") || letra.Equals("D:"))
                     {
-                        unidadeDEncontrada = true;
-                    }
+                        ulong total = Convert.ToUInt64(result["Size"]);
+                        ulong livre = Convert.ToUInt64(result["FreeSpace"]);
 
-                    string armazenamento = $"{letra}\n{total / (1024 * 1024 * 1024)} GB\n{livre / (1024 * 1024 * 1024)} GB";
-                    ArmazenamentoBuilder.AppendLine(armazenamento);
+                        string armazenamento = $"{letra}\n{total / (1024 * 1024 * 1024)} GB\n{livre / (1024 * 1024 * 1024)} GB";
+                        ArmazenamentoBuilder.AppendLine(armazenamento);
+
+                        if (letra.Equals("C:"))
+                        {
+                            unidadeCEncontrada = true;
+                        }
+                        else if (letra.Equals("D:"))
+                        {
+                            unidadeDEncontrada = true;
+                        }
+                    }
                 }
             }
 
-            // Se a unidade D: não for encontrada, adicione informações fictícias
+            if (!unidadeCEncontrada)
+            {
+                string armazenamentoC = "C:\n0 GB\n0 GB";
+                ArmazenamentoBuilder.AppendLine(armazenamentoC);
+            }
+
             if (!unidadeDEncontrada)
             {
-                string letraD = "D:";
-                string armazenamentoD = $"{letraD}\n0 GB\n0 GB";
+                string armazenamentoD = "D:\n0 GB\n0 GB";
                 ArmazenamentoBuilder.AppendLine(armazenamentoD);
             }
 

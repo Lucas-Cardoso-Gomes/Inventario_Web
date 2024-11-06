@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace coleta
 {
@@ -7,26 +8,23 @@ namespace coleta
     {
         public static string Uso()
         {
-            // Obtém a instância atual do processo
-            Process process = Process.GetCurrentProcess();
+            PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
 
-            // Obtém o contador de uso da CPU
-            PerformanceCounter cpuCounter = new(
-                "Process",
-                "% Processor Time",
-                process.ProcessName);
+            _ = cpuCounter.NextValue();
+            Thread.Sleep(1000);
 
-            // Lê o valor atual do contador
-            float cpuUsage = cpuCounter.NextValue();
+            float totalUsage = 0;
+            int samples = 10;
 
-            // Aguarda um momento para coletar outra leitura
-            System.Threading.Thread.Sleep(1000);
+            for (int i = 0; i < samples; i++)
+            {
+                totalUsage += cpuCounter.NextValue();
+                Thread.Sleep(1000);
+            }
 
-            // Lê novamente o valor do contador após um intervalo de tempo
-            cpuUsage = cpuCounter.NextValue();
-            string Consumo = cpuUsage.ToString();
-
-            // Converte o valor float para uma string e retorna
+            float averageUsage = totalUsage / samples;
+            string Consumo = averageUsage.ToString("0.00");
+            //Console.WriteLine(Consumo);
             return Consumo;
         }
     }
