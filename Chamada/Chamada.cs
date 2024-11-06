@@ -1,3 +1,5 @@
+using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Net.Sockets;
 using System.Text;
@@ -5,98 +7,133 @@ using System.Text;
 namespace ColetaDados
 {
     public class Chamada
-    {      
+    {
         public static void ColetaBD(string computador)
         {
             string computadorIp = computador;
             int serverPort = 27275;
 
-            using (TcpClient client = new TcpClient(computadorIp, serverPort))
+            try
             {
-                NetworkStream stream = client.GetStream();
-
-                string autenticacao = "SolicitarInformacoes";
-
-                byte[] data = Encoding.UTF8.GetBytes(autenticacao);
-
-                stream.Write(data, 0, data.Length);
-
-                Console.WriteLine($"Solicitação enviada ao computador: {computadorIp}");
-
-                byte[] buffer = new byte[5120];
-                int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                string resposta = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-                Console.WriteLine($"Resposta do computador: {computadorIp}");
-
-                var dadosColetados = resposta.Split('\n');
-
-                string Processador = dadosColetados[0].Trim();
-                string ProcessadorFabricante = dadosColetados[1].Trim();
-                string ProcessadorCore = dadosColetados[2].Trim();
-                string ProcessadorThread = dadosColetados[3].Trim();
-                string ProcessadorClock = dadosColetados[4].Trim();
-                string Ram = dadosColetados[5].Trim();
-                string RamTipo = dadosColetados[6].Trim();
-                string RamVelocidade = dadosColetados[7].Trim();
-                string RamVoltagem = dadosColetados[8].Trim();
-                string Usuario = dadosColetados[9].Trim();
-                string MAC = dadosColetados[10].Trim();
-                string SO = dadosColetados[11].Trim();
-                string ArmazenamentoC = dadosColetados[12].Trim();
-                string ArmazenamentoCTotal = dadosColetados[13].Trim();
-                string ArmazenamentoCLivre = dadosColetados[14].Trim();
-                string ArmazenamentoD = dadosColetados[15].Trim();
-                string ArmazenamentoDTotal = dadosColetados[16].Trim();
-                string ArmazenamentoDLivre = dadosColetados[17].Trim();
-                string ConsumoCPU = dadosColetados[18].Trim();
-                
-                string connectionString = "Server=SHADOWMOVEL;Database=Coletados;User Id=sa;Password=shadow;Trusted_Connection=False;";
-                SqlConnection connection = new SqlConnection(connectionString);
-
-                try
+                using (TcpClient client = new TcpClient(computadorIp, serverPort))
+                using (NetworkStream stream = client.GetStream())
                 {
-                    connection.Open();
-                    string insertQuery = "INSERT INTO Computadores (IP, Processador, ProcessadorFabricante, ProcessadorCore, ProcessadorThread, ProcessadorClock, Ram, RamTipo, RamVelocidade, RamVoltagem, Usuario, MAC, SO, ArmazenamentoC, ArmazenamentoCTotal, ArmazenamentoCLivre, ArmazenamentoD, ArmazenamentoDTotal, ArmazenamentoDLivre, ConsumoCPU) " +
-                                         "VALUES (@IP, @Processador, @ProcessadorFabricante, @ProcessadorCore, @ProcessadorThread, @ProcessadorClock, @Ram, @RamTipo, @RamVelocidade, @RamVoltagem, @Usuario, @MAC, @SO, @ArmazenamentoC, @ArmazenamentoCTotal, @ArmazenamentoCLivre, @ArmazenamentoD, @ArmazenamentoDTotal, @ArmazenamentoDLivre, @ConsumoCPU)";
+                    string autenticacao = "SolicitarInformacoes\nbeta";
+                    byte[] data = Encoding.UTF8.GetBytes(autenticacao);
 
-                    SqlCommand cmd = new SqlCommand(insertQuery, connection);
-                    cmd.Parameters.AddWithValue("@IP", computadorIp);
-                    cmd.Parameters.AddWithValue("@Processador", Processador);
-                    cmd.Parameters.AddWithValue("@ProcessadorFabricante", ProcessadorFabricante);
-                    cmd.Parameters.AddWithValue("@ProcessadorCore", ProcessadorCore);
-                    cmd.Parameters.AddWithValue("@ProcessadorThread", ProcessadorThread);
-                    cmd.Parameters.AddWithValue("@ProcessadorClock", ProcessadorClock);
-                    cmd.Parameters.AddWithValue("@Ram", Ram);
-                    cmd.Parameters.AddWithValue("@RamTipo", RamTipo);
-                    cmd.Parameters.AddWithValue("@RamVelocidade", RamVelocidade);
-                    cmd.Parameters.AddWithValue("@RamVoltagem", RamVoltagem);
-                    cmd.Parameters.AddWithValue("@Usuario", Usuario);
-                    cmd.Parameters.AddWithValue("@MAC", MAC);
-                    cmd.Parameters.AddWithValue("@SO", SO);
-                    cmd.Parameters.AddWithValue("@ArmazenamentoC", ArmazenamentoC);
-                    cmd.Parameters.AddWithValue("@ArmazenamentoCTotal", ArmazenamentoCTotal);
-                    cmd.Parameters.AddWithValue("@ArmazenamentoCLivre", ArmazenamentoCLivre);
-                    cmd.Parameters.AddWithValue("@ArmazenamentoD", ArmazenamentoD);
-                    cmd.Parameters.AddWithValue("@ArmazenamentoDTotal", ArmazenamentoDTotal);
-                    cmd.Parameters.AddWithValue("@ArmazenamentoDLivre", ArmazenamentoDLivre);
-                    cmd.Parameters.AddWithValue("@ConsumoCPU", ConsumoCPU);
+                    stream.Write(data, 0, data.Length);
+                    Console.WriteLine($"Solicitação enviada ao computador: {computadorIp}");
+
+                    byte[] buffer = new byte[5120];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    string resposta = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                    Console.WriteLine($"Resposta do computador: {computadorIp}");
                     
-                    cmd.ExecuteNonQuery();
+                    var dadosColetados = resposta.Split('\n');
 
-                    Console.WriteLine("Dados inseridos com sucesso na tabela 'Computadores'");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Erro ao inserir dados na tabela 'Computadores': " + ex.Message);
-                }
-                finally
-                {
-                    connection.Close();
-                }
+                    string Processador = dadosColetados[0].Trim();
+                    string ProcessadorFabricante = dadosColetados[1].Trim();
+                    string ProcessadorCore = dadosColetados[2].Trim();
+                    string ProcessadorThread = dadosColetados[3].Trim();
+                    string ProcessadorClock = dadosColetados[4].Trim();
+                    string Ram = dadosColetados[5].Trim();
+                    string RamTipo = dadosColetados[6].Trim();
+                    string RamVelocidade = dadosColetados[7].Trim();
+                    string RamVoltagem = dadosColetados[8].Trim();
+                    string Usuario = dadosColetados[9].Trim();
+                    string Hostname = dadosColetados[10].Trim();
+                    string Fabricante = dadosColetados[11].Trim();
+                    string MAC = dadosColetados[12].Trim();
+                    string SO = dadosColetados[13].Trim();
+                    string ArmazenamentoC = dadosColetados[14].Trim();
+                    string ArmazenamentoCTotal = dadosColetados[15].Trim();
+                    string ArmazenamentoCLivre = dadosColetados[16].Trim();
+                    string ArmazenamentoD = dadosColetados[17].Trim();
+                    string ArmazenamentoDTotal = dadosColetados[18].Trim();
+                    string ArmazenamentoDLivre = dadosColetados[19].Trim();
+                    string Void = dadosColetados[20].Trim();
+                    string ConsumoCPU = dadosColetados[21].Trim();
+                    
+                    //Console.WriteLine(resposta);
 
-                stream.Close();
-                client.Close();
+                    string connectionString = "Server=TECNOLOGIA01SBJ\\sqlexpress;Database=Coletados;User Id=sa;Password=123456;Trusted_Connection=False;";
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
+
+                        string mergeQuery = @"
+                            MERGE INTO Computadores AS target
+                            USING (VALUES (@MAC)) AS source (MAC)
+                            ON target.MAC = source.MAC
+                            WHEN MATCHED THEN
+                                UPDATE SET 
+                                    IP = @IP,
+                                    Processador = @Processador,
+                                    ProcessadorFabricante = @ProcessadorFabricante,
+                                    ProcessadorCore = @ProcessadorCore,
+                                    ProcessadorThread = @ProcessadorThread,
+                                    ProcessadorClock = @ProcessadorClock,
+                                    Ram = @Ram,
+                                    RamTipo = @RamTipo,
+                                    RamVelocidade = @RamVelocidade,
+                                    RamVoltagem = @RamVoltagem,
+                                    Usuario = @Usuario,
+                                    Hostname = @Hostname,
+                                    Fabricante = @Fabricante,
+                                    SO = @SO,
+                                    ArmazenamentoC = @ArmazenamentoC,
+                                    ArmazenamentoCTotal = @ArmazenamentoCTotal,
+                                    ArmazenamentoCLivre = @ArmazenamentoCLivre,
+                                    ArmazenamentoD = @ArmazenamentoD,
+                                    ArmazenamentoDTotal = @ArmazenamentoDTotal,
+                                    ArmazenamentoDLivre = @ArmazenamentoDLivre,
+                                    ConsumoCPU = @ConsumoCPU,
+                                    DataColeta = @DataColeta
+                            WHEN NOT MATCHED THEN
+                                INSERT (MAC, IP, Processador, ProcessadorFabricante, ProcessadorCore, ProcessadorThread, ProcessadorClock, Ram, RamTipo, RamVelocidade, RamVoltagem, Usuario, Hostname, Fabricante, SO, ArmazenamentoC, ArmazenamentoCTotal, ArmazenamentoCLivre, ArmazenamentoD, ArmazenamentoDTotal, ArmazenamentoDLivre, ConsumoCPU, DataColeta)
+                                VALUES (@MAC, @IP, @Processador, @ProcessadorFabricante, @ProcessadorCore, @ProcessadorThread, @ProcessadorClock, @Ram, @RamTipo, @RamVelocidade, @RamVoltagem, @Usuario, @Hostname, @Fabricante, @SO, @ArmazenamentoC, @ArmazenamentoCTotal, @ArmazenamentoCLivre, @ArmazenamentoD, @ArmazenamentoDTotal, @ArmazenamentoDLivre, @ConsumoCPU, @DataColeta);
+                        ";
+
+                        using (SqlCommand cmd = new SqlCommand(mergeQuery, connection))
+                        {
+                            cmd.Parameters.Add("@MAC", SqlDbType.NVarChar).Value = MAC;
+                            cmd.Parameters.Add("@IP", SqlDbType.NVarChar).Value = computadorIp;
+                            cmd.Parameters.Add("@Processador", SqlDbType.NVarChar).Value = Processador;
+                            cmd.Parameters.Add("@ProcessadorFabricante", SqlDbType.NVarChar).Value = ProcessadorFabricante;
+                            cmd.Parameters.Add("@ProcessadorCore", SqlDbType.NVarChar).Value = ProcessadorCore;
+                            cmd.Parameters.Add("@ProcessadorThread", SqlDbType.NVarChar).Value = ProcessadorThread;
+                            cmd.Parameters.Add("@ProcessadorClock", SqlDbType.NVarChar).Value = ProcessadorClock;
+                            cmd.Parameters.Add("@Ram", SqlDbType.NVarChar).Value = Ram;
+                            cmd.Parameters.Add("@RamTipo", SqlDbType.NVarChar).Value = RamTipo;
+                            cmd.Parameters.Add("@RamVelocidade", SqlDbType.NVarChar).Value = RamVelocidade;
+                            cmd.Parameters.Add("@RamVoltagem", SqlDbType.NVarChar).Value = RamVoltagem;
+                            cmd.Parameters.Add("@Usuario", SqlDbType.NVarChar).Value = Usuario;
+                            cmd.Parameters.Add("@Hostname", SqlDbType.NVarChar).Value = Hostname;
+                            cmd.Parameters.Add("@Fabricante", SqlDbType.NVarChar).Value = Fabricante;
+                            cmd.Parameters.Add("@SO", SqlDbType.NVarChar).Value = SO;
+                            cmd.Parameters.Add("@ArmazenamentoC", SqlDbType.NVarChar).Value = ArmazenamentoC;
+                            cmd.Parameters.Add("@ArmazenamentoCTotal", SqlDbType.NVarChar).Value = ArmazenamentoCTotal;
+                            cmd.Parameters.Add("@ArmazenamentoCLivre", SqlDbType.NVarChar).Value = ArmazenamentoCLivre;
+                            cmd.Parameters.Add("@ArmazenamentoD", SqlDbType.NVarChar).Value = ArmazenamentoD;
+                            cmd.Parameters.Add("@ArmazenamentoDTotal", SqlDbType.NVarChar).Value = ArmazenamentoDTotal;
+                            cmd.Parameters.Add("@ArmazenamentoDLivre", SqlDbType.NVarChar).Value = ArmazenamentoDLivre;
+                            cmd.Parameters.Add("@ConsumoCPU", SqlDbType.NVarChar).Value = ConsumoCPU;
+                            cmd.Parameters.Add("@DataColeta", SqlDbType.DateTime).Value = DateTime.Now;
+
+                            cmd.ExecuteNonQuery();
+                            Console.WriteLine("Dados inseridos/atualizados com sucesso na tabela 'Computadores'");
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"Erro ao inserir/atualizar dados no banco: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro inesperado: {ex.Message}");
             }
         }
     }

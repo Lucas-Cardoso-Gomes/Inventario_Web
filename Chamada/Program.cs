@@ -1,131 +1,203 @@
-﻿namespace ColetaDados
+﻿using System;
+using System.Threading.Tasks;
+
+namespace ColetaDados
 {
     partial class Program
     {
         static void Main()
         {
+            while (true)
+            {
+                Console.Clear();
 
-            /*int tempIP= 100;
-            int espera= 7200;*/
+                Console.WriteLine("Selecione uma opção:");
+                Console.WriteLine("1 - Coleta de Dados");
+                Console.WriteLine("2 - Comandos Remotos");
+                Console.WriteLine("3 - Recria Banco de dados");
+                Console.WriteLine("4 - Sair");
 
-            Thread mainThread = Thread.CurrentThread;
-            mainThread.Name = "Main Thread";
+                string opcao = Console.ReadLine();
 
+                switch (opcao)
+                {
+                    case "1":
+                        ColetaDeDados();
+                        break;
+
+                    case "2":
+                        ExecutarComandosRemotos();
+                        break;
+           
+                    case "3":
+                    bool loop = true;
+                    while (loop)
+                        {
+                        Console.Clear();
+                        
+                        Console.WriteLine("Selecione uma opção:");
+                        Console.WriteLine("1 - Limpar Banco de Dados - Computadores");
+                        Console.WriteLine("2 - Sair");
+
+                        string limpa = Console.ReadLine();
+
+                        switch (limpa)
+                        {
+                            case "1":
+                            LimpaBD.LimpaBDComputadores();
+                            loop = false;
+                            break;
+
+                            case "2":
+                            Console.WriteLine("Voltando ao menu principal...");
+                            loop = false;
+                            break;
+
+                            default:
+                            Console.WriteLine("Opção inválida. Tente novamente.");
+                            break;
+                        }
+                        }
+                        break;
+                    case "4":
+                        Console.WriteLine("Saindo do programa...");
+                        return;
+
+                    default:
+                        Console.WriteLine("Opção inválida. Tente novamente.");
+                        break;
+                }
+
+                Console.WriteLine("Pressione qualquer tecla para continuar...");
+                Console.ReadKey();
+            }
+        }
+
+        static void ColetaDeDados()
+        {
             Console.Clear();
-            Console.WriteLine("Executando em: " + mainThread.Name);
-            try
-            {
-                Chamada.ColetaBD("localhost");
-                Chamada.ColetaBD("10.1.1.251");
-                //Chamada.ColetaBD("10.1.1.249");
-                //Chamada.ColetaBD("26.90.143.101");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao coletar dados dos teste - " + "Cod:" + ex.Message);
-            }
-            /*
-            Console.WriteLine("Executando Loop de coletas: Thered 1 a 6!");
-            while(true){
-            if(tempIP==255)
-            {
-                tempIP= 100;
-                espera= 7200;
-                do{
-                    Console.WriteLine("Proxima varredura em: " + espera + "Segundos");
-                    espera--;
-                    Task.Delay(1000).Wait();
-                }while(espera!=0);
-            }
-            Thread thread1 = new Thread(() => UGN(tempIP));
-            Thread thread2 = new Thread(() => SBJ(tempIP));
-            Thread thread3 = new Thread(() => CUF(tempIP));
-            Thread thread4 = new Thread(() => ITJ(tempIP));
-            Thread thread5 = new Thread(() => FOZ(tempIP));
-            Thread thread6 = new Thread(() => DIO(tempIP));
 
-            thread1.Start();
-            thread2.Start();
-            thread3.Start();
-            thread4.Start();
-            thread5.Start();
-            thread6.Start();
-            Task.Delay(5000).Wait();
-            tempIP++;
+            Console.WriteLine("Opção selecionada: Coleta de Dados");
+
+            Console.WriteLine("Selecione uma opção:");
+            Console.WriteLine("1 - Coleta de Dados manual");
+            Console.WriteLine("2 - Coleta de Dados automatica (por faixa de IP)");
+
+            string opcao = Console.ReadLine();
+
+            switch (opcao)
+            {
+                case "1":
+
+                    Console.WriteLine("Digite o IP/HostName:");
+
+                    string ip = Console.ReadLine();
+
+                    try
+                    {
+                        Chamada.ColetaBD(ip);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Erro na coleta de dados: {ex.Message}");
+                    }
+                    break;
+
+                case "2":
+                    Console.WriteLine("Digite qual faixa de IP deseja scanear:");
+                    Console.WriteLine("1: 10.0.0.x");
+                    Console.WriteLine("2: 10.0.2.x");
+                    Console.WriteLine("3: 10.1.1.x");
+                    Console.WriteLine("4: 10.1.2.x");
+                    Console.WriteLine("5: 10.2.2.x");
+                    Console.WriteLine("6: 10.3.3.x");
+                    Console.WriteLine("7: 10.4.4.x");
+                    Console.WriteLine("8: Todas as faixas acima");
+
+                    string opcao2 = Console.ReadLine();
+                    string[] faixas = {};
+
+                    switch (opcao2)
+                    {
+                        case "1":
+                            faixas = new string[] { "10.0.0." };
+                            break;
+                        case "2":
+                            faixas = new string[] { "10.0.2." };
+                            break;
+                        case "3":
+                            faixas = new string[] { "10.1.1." };
+                            break;
+                        case "4":
+                            faixas = new string[] { "10.1.2." };
+                            break;
+                        case "5":
+                            faixas = new string[] { "10.2.2." };
+                            break;
+                        case "6":
+                            faixas = new string[] { "10.3.3." };
+                            break;
+                        case "7":
+                            faixas = new string[] { "10.4.4." };
+                            break;
+                        case "8":
+                            faixas = new string[] { "10.0.0.", "10.0.2.", "10.1.1.", "10.1.2.", "10.2.2.", "10.3.3.", "10.4.4." };
+                            break;
+                        default:
+                            Console.WriteLine("Opção inválida. Tente novamente.");
+                            return;
+                    }
+
+                    Task[] tasks = new Task[faixas.Length];
+                    for (int i = 0; i < faixas.Length; i++)
+                    {
+                        string faixaBase = faixas[i];
+                        tasks[i] = Task.Run(() => ColetaDadosPorFaixa(faixaBase));
+                    }
+                    Task.WaitAll(tasks);
+                    break;
+
+                default:
+                    Console.WriteLine("Opção inválida. Tente novamente.");
+                    break;
             }
-            */
         }
 
-        public static void UGN(int tempIP)
+        static void ColetaDadosPorFaixa(string faixaBase)
         {
-            string IPUNG= "10.0.0."+tempIP;
-            try
+            Parallel.For(1, 256, i =>
             {
-                Chamada.ColetaBD(IPUNG);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao coletar dados de: " + IPUNG + "Cod:" + ex.Message);
-            }
+                string ipFaixa = faixaBase + i.ToString();
+                try
+                {
+                    Chamada.ColetaBD(ipFaixa);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro na coleta de dados para {ipFaixa}: {ex.Message}");
+                }
+            });
         }
-        public static void SBJ(int tempIP)
+
+        static void ExecutarComandosRemotos()
         {
-            string IPUNG= "10.1.1."+tempIP;
+            Console.Clear();
+
+            Console.WriteLine("Opção selecionada: Comandos Remotos");
+
+            Console.WriteLine("Digite o IP da Máquina:");
+            string ip = Console.ReadLine();
+
+            Console.WriteLine("Digite o Comando a ser executado:");
+            string comando = Console.ReadLine();
+
             try
             {
-                Chamada.ColetaBD(IPUNG);
+                Comandos.Comando(ip, comando);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao coletar dados de: " + IPUNG + "Cod:" + ex.Message);
-            }
-        }
-        public static void CUF(int tempIP)
-        {
-            string IPUNG= "10.1.2."+tempIP;
-            try
-            {
-                Chamada.ColetaBD(IPUNG);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao coletar dados de: " + IPUNG + "Cod:" + ex.Message);
-            }
-        }
-        public static void ITJ(int tempIP)
-        {
-            string IPUNG= "10.2.2."+tempIP;
-            try
-            {
-                Chamada.ColetaBD(IPUNG);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao coletar dados de: " + IPUNG + "Cod:" + ex.Message);
-            }
-        }
-        public static void FOZ(int tempIP)
-        {
-            string IPUNG= "10.3.3."+tempIP;
-            try
-            {
-                Chamada.ColetaBD(IPUNG);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao coletar dados de: " + IPUNG + "Cod:" + ex.Message);
-            }
-        }
-        public static void DIO(int tempIP)
-        {
-            string IPUNG= "10.4.4."+tempIP;
-            try
-            {
-                Chamada.ColetaBD(IPUNG);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao coletar dados de: " + IPUNG + "Cod:" + ex.Message);
+                Console.WriteLine($"Erro ao executar comandos remotos: {ex.Message}");
             }
         }
     }
